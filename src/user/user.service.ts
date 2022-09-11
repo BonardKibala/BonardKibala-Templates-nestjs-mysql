@@ -49,7 +49,7 @@ export class UserService {
 
     try {
       if (finduser) {
-        return { response: "l'utilisateur existe déjà" };
+        return { error: "l'utilisateur existe déjà" };
       }
       await queryRunner.manager.save(user);
 
@@ -78,9 +78,9 @@ export class UserService {
     const user: LoginEntity = await qb.getOne();
 
     if (!user)
-      throw new NotFoundException(
-        "le login ci-après n'existe pas, essayez-en un autre svp",
-      );
+      throw new NotFoundException({
+        error: "le login ci-après n'existe pas, essayez-en un autre svp",
+      });
 
     if (password === user.password) {
       const payload = {
@@ -89,7 +89,10 @@ export class UserService {
       };
       const userlogged = { id: user.id, login: user.login };
       return { user: userlogged, acces_token: this.jwtService.sign(payload) };
-    } else throw new NotFoundException('Mot de passe incorect');
+    } else
+      throw new NotFoundException({
+        error: 'Mot de passe incorect',
+      });
   }
 
   async getuserById(id: string): Promise<LoginEntity> {
@@ -106,7 +109,9 @@ export class UserService {
     });
 
     if (!newUser) {
-      throw new NotFoundException('échec de modification');
+      throw new NotFoundException({
+        error: 'échec de modification',
+      });
     }
     return this.userRepository.save(newUser);
   }
@@ -114,9 +119,9 @@ export class UserService {
   async removeUser(id: string) {
     const userToremove = await this.userRepository.findOne(id);
     if (!userToremove) {
-      throw new NotFoundException(
-        `Erreur de suppression ou adresse non existante`,
-      );
+      throw new NotFoundException({
+        error: `Erreur de suppression ou adresse non existante`,
+      });
     }
     return await this.userRepository.remove(userToremove);
   }

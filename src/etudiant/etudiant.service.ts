@@ -84,6 +84,10 @@ export class EtudiantService {
         `Erreur de suppression ou l'information n'existe pas`,
       );
     }
-    return await this.etudiantRepository.remove(etudiantToremove);
+    await this.etudiantRepository.remove(etudiantToremove);
+    const etudiants = await this.etudiantRepository.find();
+    return {
+      data: etudiants,
+    };
   }
 }
